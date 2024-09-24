@@ -6,6 +6,13 @@ public class User {
     private String role; // Standard, CompanyAdmin, SuperUser
     private Long companyId;
     
+    public User(Long id, String name, String role, Long companyId) {
+    	this.id = id;
+    	this.name = name;
+    	this.role = role;
+    	this.companyId = companyId;
+    }
+    
 	public Long getId() {
 		return id;
 	}
