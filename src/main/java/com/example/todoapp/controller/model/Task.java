@@ -7,6 +7,14 @@ public class Task {
     private Long companyId;
     private boolean completed;
     
+    public Task(Long id, String description, boolean completed, Long userId, Long companyId) {
+        this.id = id;
+        this.description = description;
+        this.completed = completed;
+        this.userId = userId;
+        this.companyId = companyId;
+    }
+    
 	public Long getId() {
 		return id;
 	}

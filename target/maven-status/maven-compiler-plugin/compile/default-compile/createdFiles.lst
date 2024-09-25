@@ -1,0 +1,5 @@
+com\example\todoapp\controller\TodoListAppApplication.class
+com\example\todoapp\controller\service\TaskService.class
+com\example\todoapp\controller\TaskController.class
+com\example\todoapp\controller\model\User.class
+com\example\todoapp\controller\model\Task.class
