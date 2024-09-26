@@ -1,3 +1,4 @@
+/*
 package com.example.todoapp.controller;
 
 import com.example.todoapp.controller.model.Task;
@@ -16,12 +17,11 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    // La méthode getTasks modifiée pour accepter le rôle dans la requête
+    //
     @GetMapping
     public List<Task> getTasks(@RequestParam String role) {
         User currentUser;
 
-        // Simulation des différents types d'utilisateurs selon le rôle
         switch (role) {
             case "Super":
                 currentUser = new User(3L, "Super User", "Super", 0L);
@@ -40,7 +40,6 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@RequestBody Task task, @RequestParam String role) {
         User currentUser;
 
-        // Simulation des rôles dans createTask aussi
         switch (role) {
             case "Super":
                 currentUser = new User(3L, "Super User", "Super", 0L);
@@ -94,3 +93,4 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 }
+*/

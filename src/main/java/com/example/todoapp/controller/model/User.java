@@ -13,6 +13,7 @@ public class User {
     	this.companyId = companyId;
     }
     
+    // Getters and Setters
 	public Long getId() {
 		return id;
 	}

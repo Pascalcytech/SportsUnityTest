@@ -13,12 +13,12 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Automatically generate the ID
     private Long id;
 
-    @Column(nullable = false) // Optional: indicates that description cannot be null
+    @Column(nullable = false) // Indicates that description cannot be null
     private String description;
 
-    private Long userId; // Not annotated, assuming you want to manage it manually
+    private Long userId;
 
-    private Long companyId; // Not annotated, assuming you want to manage it manually
+    private Long companyId;
 
     private boolean completed;
 
