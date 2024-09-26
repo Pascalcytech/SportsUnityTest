@@ -1,72 +1,94 @@
 package com.example.todoapp.controller.service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.todoapp.controller.model.Task;
 import com.example.todoapp.controller.model.User;
+import com.example.todoapp.controller.repository.TaskRepository;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class TaskService {
 
-    private Map<Long, Task> taskStore = new HashMap<>();
+    @Autowired
+    private TaskRepository taskRepository;
 
-    public Task createTask(Task task) {
-        task.setId(generateTaskId());
-        taskStore.put(task.getId(), task);
-        return task;
-    }
-
+    // Get tasks based on the user's role
     public List<Task> getTasksForUser(User user) {
         if (user.getRole().equals("Super")) {
-            return new ArrayList<>(taskStore.values());
+            // Super users can access all tasks
+            return taskRepository.findAll();
         } else if (user.getRole().equals("Company-Admin")) {
-            return taskStore.values().stream()
-                    .filter(task -> task.getCompanyId().equals(user.getCompanyId()))
-                    .collect(Collectors.toList());
+            // Company-Admin users can access tasks of all users in the same company
+            return taskRepository.findByCompanyId(user.getCompanyId());
         } else {
-            return taskStore.values().stream()
-                    .filter(task -> task.getUserId().equals(user.getId()))
-                    .collect(Collectors.toList());
+            // Standard users can only access their own tasks
+            return taskRepository.findByUserId(user.getId());
         }
     }
 
+    // Create a new task
+    public Task createTask(Task task) {
+        return taskRepository.save(task);
+    }
+
+    // Update task with role-based restriction
     public Task updateTask(Long taskId, Task updatedTask, User user) {
-        Task task = taskStore.get(taskId);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        if (task != null && canUserModifyTask(task, user)) {
-            task.setDescription(updatedTask.getDescription());
-            task.setCompleted(updatedTask.isCompleted());
-            return task;
-        } else {
-            throw new RuntimeException("Task not found or permission denied.");
-        }
-    }
-
-    public void deleteTask(Long taskId, User user) {
-        Task task = taskStore.get(taskId);
-        if (task != null && canUserModifyTask(task, user)) {
-            taskStore.remove(taskId);
-        } else {
-            throw new RuntimeException("Task not found or permission denied.");
-        }
-    }
-
-    private Long generateTaskId() {
-        return (long) (taskStore.size() + 1);
-    }
-    
-    private boolean canUserModifyTask(Task task, User user) {
+        // Role-based update permission logic:
         if (user.getRole().equals("Super")) {
-            return true;
+            // Super users can update any task
+            return updateTaskFields(task, updatedTask);
+        } else if (user.getRole().equals("Company-Admin")) {
+            // Company-Admin users can update tasks within their company
+            if (task.getCompanyId().equals(user.getCompanyId())) {
+                return updateTaskFields(task, updatedTask);
+            } else {
+                throw new RuntimeException("Permission denied: Cannot update tasks outside your company.");
+            }
+        } else {
+            // Standard users can only update their own tasks
+            if (task.getUserId().equals(user.getId())) {
+                return updateTaskFields(task, updatedTask);
+            } else {
+                throw new RuntimeException("Permission denied: Cannot update other users' tasks.");
+            }
         }
+    }
 
-        if (user.getRole().equals("Company-Admin") && task.getCompanyId().equals(user.getCompanyId())) {
-            return true;
+    // Delete task with role-based restriction
+    public void deleteTask(Long taskId, User user) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        // Role-based delete permission logic:
+        if (user.getRole().equals("Super")) {
+            // Super users can delete any task
+            taskRepository.delete(task);
+        } else if (user.getRole().equals("Company-Admin")) {
+            // Company-Admin users can delete tasks within their company
+            if (task.getCompanyId().equals(user.getCompanyId())) {
+                taskRepository.delete(task);
+            } else {
+                throw new RuntimeException("Permission denied: Cannot delete tasks outside your company.");
+            }
+        } else {
+            // Standard users can only delete their own tasks
+            if (task.getUserId().equals(user.getId())) {
+                taskRepository.delete(task);
+            } else {
+                throw new RuntimeException("Permission denied: Cannot delete other users' tasks.");
+            }
         }
-        
-        return user.getRole().equals("Standard") && task.getUserId().equals(user.getId());
+    }
+
+    // Helper method to update task fields
+    private Task updateTaskFields(Task existingTask, Task updatedTask) {
+        existingTask.setDescription(updatedTask.getDescription());
+        existingTask.setCompleted(updatedTask.isCompleted());
+        return taskRepository.save(existingTask);
     }
 }
