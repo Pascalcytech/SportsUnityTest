@@ -15,7 +15,7 @@
     </parent>
 
 	<properties>
-        <java.version>17</java.version> <!-- Ensure you're using the correct Java version -->
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
@@ -25,7 +25,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Lombok (Optional for getters/setters) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -36,14 +35,14 @@
 		<dependency>
     		<groupId>com.h2database</groupId>
     		<artifactId>h2</artifactId>
-    		<scope>runtime</scope>
+    		<scope>test</scope>
 		</dependency>
 
         <!-- JUnit for testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>runtime</scope>
+            <scope>test</scope>
         </dependency>
 	
 	    <!-- Spring Boot Starter Data JPA -->

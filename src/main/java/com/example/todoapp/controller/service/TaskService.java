@@ -23,8 +23,8 @@ public class TaskService {
             // Company-Admin users can access tasks of all users in the same company
             return taskRepository.findByCompanyId(user.getCompanyId());
         } else {
-            // Standard users can only access their own tasks
-            return taskRepository.findByUserId(user.getId());
+            // Standard users can only access their own tasks, restricted to their company
+            return taskRepository.findByUserIdAndCompanyId(user.getId(), user.getCompanyId());
         }
     }
 
@@ -50,8 +50,8 @@ public class TaskService {
                 throw new RuntimeException("Permission denied: Cannot update tasks outside your company.");
             }
         } else {
-            // Standard users can only update their own tasks
-            if (task.getUserId().equals(user.getId())) {
+            // Standard users can only update their own tasks, restricted to their company
+            if (task.getUserId().equals(user.getId()) && task.getCompanyId().equals(user.getCompanyId())) {
                 return updateTaskFields(task, updatedTask);
             } else {
                 throw new RuntimeException("Permission denied: Cannot update other users' tasks.");
@@ -76,8 +76,8 @@ public class TaskService {
                 throw new RuntimeException("Permission denied: Cannot delete tasks outside your company.");
             }
         } else {
-            // Standard users can only delete their own tasks
-            if (task.getUserId().equals(user.getId())) {
+            // Standard users can only delete their own tasks, restricted to their company
+            if (task.getUserId().equals(user.getId()) && task.getCompanyId().equals(user.getCompanyId())) {
                 taskRepository.delete(task);
             } else {
                 throw new RuntimeException("Permission denied: Cannot delete other users' tasks.");
